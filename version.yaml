@@ -1,0 +1,39 @@
+---
+- name: Cisco ios devices
+  hosts: switches
+  gather_facts: no
+  connection: network_cli
+ 
+  tasks:
+    - name: Backup 
+      ios_command:
+        commands:
+          - show running-config
+          - show tech-support 
+          
+      register: cisco_config
+ 
+ 
+    - name: Save the config
+      copy:
+        content: "{{ cisco_config.stdout[0] }}"
+        dest: "~/{{ inventory_hostname }}_backup.txt"
+ 
+    - name: Get show tech support
+      copy:
+        content: "{{ cisco_config.stdout[1] }}"
+        dest: "~/{{ inventory_hostname }}_show_tech.txt"
+
+  
+ 
+    - name: CHECK CURRENT VERSION
+      ios_facts:
+ 
+    - debug:
+        msg:
+        - "Current version is {{ ansible_net_version }}"
+        
+ 
+
+
+...
